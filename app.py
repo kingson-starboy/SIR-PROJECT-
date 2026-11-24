@@ -435,14 +435,86 @@ st.markdown(
         box-shadow: 0 0 6px #10B981;
     }}
 
-    /* UNIFIED DOWNLOAD BUTTON CONTAINER (EQUAL HEIGHTS) */
+    /* UNIFIED DOWNLOAD BUTTON CONTAINER (EQUAL HEIGHTS & NO TEXT WRAPPING) */
+    .stDownloadButton,
     .stDownloadButton button {{
         background: {c_surface} !important;
         border: 1px solid {c_border} !important;
         color: {c_text_main} !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
-        min-height: 48px !important;
+        font-size: 0.82rem !important;
+        min-height: 44px !important;
+        white-space: nowrap !important;
+        word-break: keep-all !important;
+        text-overflow: ellipsis !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 8px 12px !important;
+        transition: all 0.2s ease !important;
+    }}
+    .stDownloadButton button:hover {{
+        border-color: {c_border_focus} !important;
+        color: {c_primary} !important;
+    }}
+
+    /* SELECTBOX POPOVER & DROPDOWNS */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div,
+    ul[role="listbox"],
+    li[role="option"] {{
+        background-color: {c_surface} !important;
+        color: {c_text_main} !important;
+        border-color: {c_border} !important;
+    }}
+    li[role="option"]:hover,
+    li[role="option"][aria-selected="true"] {{
+        background-color: {c_surface_elevated} !important;
+        color: {c_primary} !important;
+    }}
+
+    /* NUMBER INPUT STEPPERS */
+    button[data-testid="stNumberInputStepDown"],
+    button[data-testid="stNumberInputStepUp"] {{
+        background-color: {c_input_bg} !important;
+        color: {c_text_main} !important;
+        border-color: {c_input_border} !important;
+    }}
+
+    /* FILE UPLOADER DROPZONE */
+    [data-testid="stFileUploader"],
+    section[data-testid="stFileUploadDropzone"] {{
+        background-color: {c_surface} !important;
+        border: 1px dashed {c_border} !important;
+        color: {c_text_main} !important;
+    }}
+    [data-testid="stFileUploader"] span,
+    [data-testid="stFileUploader"] small,
+    section[data-testid="stFileUploadDropzone"] div {{
+        color: {c_text_muted} !important;
+    }}
+
+    /* METRIC LABELS & VALUES */
+    [data-testid="stMetricValue"] {{
+        color: {c_text_main} !important;
+    }}
+    [data-testid="stMetricLabel"] {{
+        color: {c_text_muted} !important;
+    }}
+
+    /* ALERTS & EXPANDERS */
+    .stAlert {{
+        background-color: {c_surface_elevated} !important;
+        color: {c_text_main} !important;
+        border: 1px solid {c_border} !important;
+    }}
+    [data-testid="stExpander"] {{
+        background-color: {c_surface} !important;
+        border: 1px solid {c_border} !important;
+    }}
+    [data-testid="stExpander"] summary {{
+        color: {c_text_main} !important;
     }}
     </style>
     """,
@@ -1145,10 +1217,55 @@ elif nav_selection == "Scenario Comparison":
         )
 
 
+def render_styled_dataframe(df: pd.DataFrame, is_dark_mode: bool = False) -> None:
+    """Renders a responsive, high-contrast HTML table that dynamically matches the active theme."""
+    th_bg = "#1E293B" if is_dark_mode else "#F1F5F9"
+    th_color = "#F8FAFC" if is_dark_mode else "#0F172A"
+    td_color = "#E2E8F0" if is_dark_mode else "#334155"
+    border_c = "rgba(255, 255, 255, 0.08)" if is_dark_mode else "#E2E8F0"
+    row_alt = "#161F30" if is_dark_mode else "#F8FAFC"
+    row_base = "#111827" if is_dark_mode else "#FFFFFF"
+
+    headers_html = "".join(
+        f"<th style='padding: 10px 14px; text-align: right; font-size: 0.76rem; font-weight: 700; color: {th_color}; text-transform: uppercase; letter-spacing: 0.04em;'>{col}</th>"
+        for col in df.columns
+    )
+
+    rows_html = []
+    for idx, row in df.iterrows():
+        bg = row_alt if idx % 2 == 1 else row_base
+        cells = []
+        for val in row:
+            if isinstance(val, (float, np.floating)):
+                formatted_val = f"{val:,.4f}" if abs(val) < 1000 else f"{val:,.0f}"
+            elif isinstance(val, (int, np.integer)):
+                formatted_val = f"{val:,}"
+            else:
+                formatted_val = str(val)
+            cells.append(
+                f"<td style='padding: 9px 14px; text-align: right; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.82rem; color: {td_color}; border-bottom: 1px solid {border_c};'>{formatted_val}</td>"
+            )
+        rows_html.append(f"<tr style='background: {bg};'>{''.join(cells)}</tr>")
+
+    table_html = f"""
+    <div style='overflow-x: auto; border: 1px solid {border_c}; border-radius: 8px; margin-bottom: 16px; box-shadow: {"0 4px 20px rgba(0,0,0,0.3)" if is_dark_mode else "0 1px 3px rgba(0,0,0,0.05)"};'>
+        <table style='width: 100%; border-collapse: collapse; text-align: right;'>
+            <thead style='background: {th_bg}; border-bottom: 2px solid {border_c};'>
+                <tr>{headers_html}</tr>
+            </thead>
+            <tbody>
+                {''.join(rows_html)}
+            </tbody>
+        </table>
+    </div>
+    """
+    st.markdown(table_html, unsafe_allow_html=True)
+
+
 # -----------------------------------------------------------------------------
 # 7. VIEW 3: DATA & REPORTS (CLEAN TELEMETRY HUB)
 # -----------------------------------------------------------------------------
-elif nav_selection == "Data & Reports":
+if nav_selection == "Data & Reports":
     st.markdown(
         """
         <div class="hero-header">
@@ -1181,12 +1298,12 @@ elif nav_selection == "Data & Reports":
 
         st.markdown(
             f"""
-            <div style="background:{c_surface}; border:1px solid {c_border}; border-radius:12px; padding:20px; margin-bottom:20px;">
-                <div style="font-size:0.95rem; font-weight:700; color:{c_text_main}; margin-bottom:12px;">📊 Numerical Trajectory Time Series Data (First 10 Rows)</div>
+            <div style="background:{c_surface}; border:1px solid {c_border}; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:{c_card_shadow};">
+                <div style="font-size:0.95rem; font-weight:700; color:{c_text_main}; margin-bottom:14px;">📊 Numerical Trajectory Time Series Data (First 10 Rows)</div>
             """,
             unsafe_allow_html=True,
         )
-        st.dataframe(df_export.head(10), use_container_width=True)
+        render_styled_dataframe(df_export.head(10), is_dark_mode=is_dark)
         st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("#### Export Scientific Deliverables")
@@ -1194,7 +1311,7 @@ elif nav_selection == "Data & Reports":
 
         with col_ex1:
             st.download_button(
-                label="📥 Download CSV Dataset",
+                label="📥 Export CSV",
                 data=csv_data,
                 file_name="episim_trajectory.csv",
                 mime="text/csv",
@@ -1203,7 +1320,7 @@ elif nav_selection == "Data & Reports":
 
         with col_ex2:
             st.download_button(
-                label="⚙️ Download JSON Metadata",
+                label="⚙️ Export JSON",
                 data=json_data,
                 file_name="episim_run_parameters.json",
                 mime="application/json",
@@ -1212,7 +1329,7 @@ elif nav_selection == "Data & Reports":
 
         with col_ex3:
             st.download_button(
-                label="📝 Download Text Summary",
+                label="📝 Export Summary",
                 data=txt_summary,
                 file_name="episim_executive_summary.txt",
                 mime="text/plain",
@@ -1222,7 +1339,7 @@ elif nav_selection == "Data & Reports":
         with col_ex4:
             pdf_bytes = generate_simulation_pdf(sim, summ)
             st.download_button(
-                label="📑 Download PDF Clinical Report",
+                label="📑 Export PDF",
                 data=pdf_bytes,
                 file_name="episim_clinical_report.pdf",
                 mime="application/pdf",
