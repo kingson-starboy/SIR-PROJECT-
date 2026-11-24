@@ -1,0 +1,22 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE & OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
