@@ -26,48 +26,103 @@ COLOR_BACKGROUND = "#F7F8FA"  # Canvas Neutral Tint
 COLOR_ACCENT_PURPLE = "#7C3AED"  # Analytical Violet
 
 # Common Chart Layout Defaults
-CHART_LAYOUT_DEFAULTS = dict(
-    font=dict(
-        family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-        size=12,
-        color="#1E293B",
-    ),
-    paper_bgcolor="#FFFFFF",
-    plot_bgcolor="#FFFFFF",
-    hovermode="x unified",
-    margin=dict(l=60, r=30, t=55, b=50),
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.03,
-        xanchor="right",
-        x=1,
-        bgcolor="rgba(255, 255, 255, 0.95)",
-        bordercolor="#E2E8F0",
-        borderwidth=1,
-        font=dict(size=11, color="#334155"),
-    ),
-    xaxis=dict(
-        showgrid=True,
-        gridcolor=COLOR_GRID,
-        gridwidth=1,
-        zeroline=True,
-        zerolinecolor="#CBD5E1",
-        linecolor="#CBD5E1",
-        tickfont=dict(size=11, color="#64748B"),
-        title_font=dict(size=12, color="#334155"),
-    ),
-    yaxis=dict(
-        showgrid=True,
-        gridcolor=COLOR_GRID,
-        gridwidth=1,
-        zeroline=True,
-        zerolinecolor="#CBD5E1",
-        linecolor="#CBD5E1",
-        tickfont=dict(size=11, color="#64748B"),
-        title_font=dict(size=12, color="#334155"),
-    ),
-)
+def get_chart_layout(is_dark: bool = False) -> dict:
+    """Return layout dictionary customized for Light or Dark theme."""
+    if is_dark:
+        bg = "#111827"
+        plot_bg = "#0F172A"
+        text_color = "#F8FAFC"
+        grid_color = "#1E293B"
+        zero_color = "#334155"
+        legend_bg = "rgba(17, 24, 39, 0.95)"
+        legend_border = "#334155"
+        legend_text = "#E2E8F0"
+        sub_text = "#94A3B8"
+    else:
+        bg = "#FFFFFF"
+        plot_bg = "#FFFFFF"
+        text_color = "#0F172A"
+        grid_color = "#E5E8EF"
+        zero_color = "#CBD5E1"
+        legend_bg = "rgba(255, 255, 255, 0.95)"
+        legend_border = "#E2E8F0"
+        legend_text = "#334155"
+        sub_text = "#64748B"
+
+    return dict(
+        font=dict(
+            family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+            size=12,
+            color=text_color,
+        ),
+        paper_bgcolor=bg,
+        plot_bgcolor=plot_bg,
+        hovermode="x unified",
+        margin=dict(l=60, r=30, t=75, b=65),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.16,
+            xanchor="center",
+            x=0.5,
+            bgcolor=legend_bg,
+            bordercolor=legend_border,
+            borderwidth=1,
+            font=dict(size=11, color=legend_text),
+        ),
+        xaxis=dict(
+            showgrid=True,
+            gridcolor=grid_color,
+            gridwidth=1,
+            zeroline=True,
+            zerolinecolor=zero_color,
+            linecolor=zero_color,
+            tickfont=dict(size=11, color=sub_text),
+            title_font=dict(size=12, color=text_color),
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor=grid_color,
+            gridwidth=1,
+            zeroline=True,
+            zerolinecolor=zero_color,
+            linecolor=zero_color,
+            tickfont=dict(size=11, color=sub_text),
+            title_font=dict(size=12, color=text_color),
+        ),
+    )
+
+
+CHART_LAYOUT_DEFAULTS = get_chart_layout(is_dark=False)
+
+
+def apply_theme_to_figure(fig: go.Figure, is_dark: bool = False) -> go.Figure:
+    """Dynamically applies Light or Dark theme styling to a Plotly Figure."""
+    if is_dark:
+        layout = get_chart_layout(is_dark=True)
+        fig.update_layout(
+            paper_bgcolor=layout["paper_bgcolor"],
+            plot_bgcolor=layout["plot_bgcolor"],
+            font=layout["font"],
+            legend=layout["legend"],
+            xaxis=dict(
+                gridcolor=layout["xaxis"]["gridcolor"],
+                zerolinecolor=layout["xaxis"]["zerolinecolor"],
+                linecolor=layout["xaxis"]["linecolor"],
+                tickfont=layout["xaxis"]["tickfont"],
+                title_font=layout["xaxis"]["title_font"],
+            ),
+            yaxis=dict(
+                gridcolor=layout["yaxis"]["gridcolor"],
+                zerolinecolor=layout["yaxis"]["zerolinecolor"],
+                linecolor=layout["yaxis"]["linecolor"],
+                tickfont=layout["yaxis"]["tickfont"],
+                title_font=layout["yaxis"]["title_font"],
+            ),
+        )
+        if fig.layout.title.text:
+            fig.update_layout(title_font_color="#F8FAFC")
+    return fig
 
 
 def create_sir_curve_chart(result: SIRSimulationResult) -> go.Figure:
@@ -729,10 +784,10 @@ def create_scenario_comparison_chart(
     fig.update_layout(
         **CHART_LAYOUT_DEFAULTS,
         title=dict(
-            text=f"<b>Comparative Epidemic Trajectory: {label_a} vs {label_b}</b>",
+            text="<b>Comparative Epidemic Trajectory (Dual Scenarios)</b>",
             font=dict(size=15, color="#0F172A"),
-            x=0.01,
-            y=0.97,
+            x=0.015,
+            y=0.96,
         ),
         xaxis_title="Simulation Time (Days)",
         yaxis_title="Population Count (Individuals)",
