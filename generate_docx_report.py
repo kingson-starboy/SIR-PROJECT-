@@ -25,11 +25,11 @@ def set_cell_background(cell, hex_color):
 def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
     """Set inner cell padding in twips."""
     tcPr = cell._tc.get_or_add_tcPr()
-    tcMar = OxmlElement('w:tcMar')
-    for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
-        node = OxmlElement(f'w:{m}')
-        node.set(qn('w:w'), str(val))
-        node.set(qn('w:type'), 'dxa')
+    tcMar = OxmlElement("w:tcMar")
+    for m, val in [("top", top), ("bottom", bottom), ("left", left), ("right", right)]:
+        node = OxmlElement(f"w:{m}")
+        node.set(qn("w:w"), str(val))
+        node.set(qn("w:type"), "dxa")
         tcMar.append(node)
     tcPr.append(tcMar)
 
@@ -65,16 +65,18 @@ def build_docx():
         section.page_height = Inches(11.69)
 
     # Base style configurations
-    style_normal = doc.styles['Normal']
+    style_normal = doc.styles["Normal"]
     font = style_normal.font
-    font.name = 'Calibri'
+    font.name = "Calibri"
     font.size = Pt(10)
     font.color.rgb = RGBColor(51, 65, 85)
 
     # ==================== COVER PAGE ====================
     p_inst = doc.add_paragraph()
     p_inst.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_inst = p_inst.add_run("DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING\nACADEMIC PROJECT TECHNICAL REPORT — 2026")
+    r_inst = p_inst.add_run(
+        "DEPARTMENT OF COMPUTER SCIENCE & ENGINEERING\nACADEMIC PROJECT TECHNICAL REPORT — 2026"
+    )
     r_inst.font.size = Pt(10)
     r_inst.font.bold = True
     r_inst.font.color.rgb = RGBColor(30, 58, 138)
@@ -82,7 +84,9 @@ def build_docx():
 
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_title = p_title.add_run("Disease Spread Prediction and Simulation System\nUsing SIR Differential Equations")
+    r_title = p_title.add_run(
+        "Disease Spread Prediction and Simulation System\nUsing SIR Differential Equations"
+    )
     r_title.font.size = Pt(22)
     r_title.font.bold = True
     r_title.font.color.rgb = RGBColor(15, 23, 42)
@@ -90,7 +94,9 @@ def build_docx():
 
     p_sub = doc.add_paragraph()
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_sub = p_sub.add_run("EpiSim Pro: An Industry-Standard Epidemiological Intelligence & Simulation Platform")
+    r_sub = p_sub.add_run(
+        "EpiSim Pro: An Industry-Standard Epidemiological Intelligence & Simulation Platform"
+    )
     r_sub.font.size = Pt(12)
     r_sub.font.bold = True
     r_sub.font.color.rgb = RGBColor(37, 99, 235)
@@ -104,7 +110,10 @@ def build_docx():
         ("Degree & Branch:", "Bachelor of Technology / Master of Science in Computer Science"),
         ("Project Supervisor / Guide:", "Dr. [Supervisor Name], Professor of Computational Biology"),
         ("Academic Institution:", "[Department of Computer Science & Engineering, University Name]"),
-        ("Verification & Verification Suite:", "146 / 146 Automated Pytest Unit/Integration Tests Passing (100%)"),
+        (
+            "Verification & Verification Suite:",
+            "146 / 146 Automated Pytest Unit/Integration Tests Passing (100%)",
+        ),
         ("Submission Date & Status:", "Academic Year 2025–2026 | Verified Production-Ready Build"),
     ]
     for i, (label, val) in enumerate(meta_data):
@@ -189,7 +198,12 @@ def build_docx():
         "S(t) + I(t) + R(t) = N, and comprehensive clinical analytics."
     )
     p1.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_01_sir_compartment_flow.png", 5.8, "Figure 1.1: SIR Compartmental Transmission Dynamics & Mass Conservation Flux")
+    add_image_safely(
+        doc,
+        "fig_01_sir_compartment_flow.png",
+        5.8,
+        "Figure 1.1: SIR Compartmental Transmission Dynamics & Mass Conservation Flux",
+    )
 
     # ==================== CHAPTER 2 ====================
     add_chapter_header(2, "Introduction, Clinical Motivation & Background")
@@ -201,7 +215,12 @@ def build_docx():
         "dynamic transmission modeling, healthcare capacity threshold tracking, and comparative intervention testing."
     )
     p2.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_02_problem_solution.png", 5.8, "Figure 2.1: Computational Bridge from Clinical Challenge to Epidemic Control Architecture")
+    add_image_safely(
+        doc,
+        "fig_02_problem_solution.png",
+        5.8,
+        "Figure 2.1: Computational Bridge from Clinical Challenge to Epidemic Control Architecture",
+    )
 
     # ==================== CHAPTER 3 ====================
     add_chapter_header(3, "Mathematical Foundations of the SIR Compartmental Model")
@@ -221,8 +240,18 @@ def build_docx():
     p3_eq.runs[0].font.size = Pt(9.5)
     p3_eq.runs[0].font.color.rgb = RGBColor(30, 41, 59)
     p3_eq.paragraph_format.space_after = Pt(8)
-    add_image_safely(doc, "fig_03_equation_breakdown.png", 5.8, "Figure 3.1: Mathematical Decomposition of the Kermack-McKendrick Differential System")
-    add_image_safely(doc, "fig_04_r0_threshold.png", 5.8, "Figure 3.2: Basic Reproduction Number (R0) Threshold Dynamics and Herd Immunity Transition")
+    add_image_safely(
+        doc,
+        "fig_03_equation_breakdown.png",
+        5.8,
+        "Figure 3.1: Mathematical Decomposition of the Kermack-McKendrick Differential System",
+    )
+    add_image_safely(
+        doc,
+        "fig_04_r0_threshold.png",
+        5.8,
+        "Figure 3.2: Basic Reproduction Number (R0) Threshold Dynamics and Herd Immunity Transition",
+    )
 
     # ==================== CHAPTER 4 ====================
     add_chapter_header(4, "System Architecture & Modular Decoupling")
@@ -233,8 +262,15 @@ def build_docx():
         "and accessible Plotly visual rendering. The export subsystem (`export.py`) operates as a headless document generation service."
     )
     p4.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_05_technology_architecture.png", 5.8, "Figure 4.1: Decoupled Multi-Layer Technology Architecture")
-    add_image_safely(doc, "fig_06_system_architecture.png", 5.8, "Figure 4.2: Data Flow and Component Interaction Pipeline")
+    add_image_safely(
+        doc,
+        "fig_05_technology_architecture.png",
+        5.8,
+        "Figure 4.1: Decoupled Multi-Layer Technology Architecture",
+    )
+    add_image_safely(
+        doc, "fig_06_system_architecture.png", 5.8, "Figure 4.2: Data Flow and Component Interaction Pipeline"
+    )
 
     # ==================== CHAPTER 5 ====================
     add_chapter_header(5, "Numerical Solver Implementation (SciPy RK45 vs Euler)")
@@ -246,7 +282,12 @@ def build_docx():
         "during asymptotic decline, maintaining absolute tolerances of atol=1e-8 and rtol=1e-6."
     )
     p5.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_08_sample_sir_simulation.png", 5.8, "Figure 5.1: High-Precision RK45 Numerical Trajectory (N=10,000, R0=3.00, Peak Day 38.6)")
+    add_image_safely(
+        doc,
+        "fig_08_sample_sir_simulation.png",
+        5.8,
+        "Figure 5.1: High-Precision RK45 Numerical Trajectory (N=10,000, R0=3.00, Peak Day 38.6)",
+    )
 
     # ==================== CHAPTER 6 ====================
     add_chapter_header(6, "User Interface Architecture & Design Systems")
@@ -257,7 +298,12 @@ def build_docx():
         "reactive sliders, synchronized date range scrubbers, preset selectors, and CSV upload parsers."
     )
     p6.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "screenshot_01_dashboard.png", 5.8, "Figure 6.1: EpiSim Pro Production Web Application — Primary Simulation Dashboard")
+    add_image_safely(
+        doc,
+        "screenshot_01_dashboard.png",
+        5.8,
+        "Figure 6.1: EpiSim Pro Production Web Application — Primary Simulation Dashboard",
+    )
 
     # ==================== CHAPTER 7 ====================
     add_chapter_header(7, "Feature Walkthrough: Interactive Simulation Dashboard")
@@ -269,7 +315,12 @@ def build_docx():
         "Daily New Incidence, Phase Space Orbits, and Population Distribution Donuts with animated day scrubbers."
     )
     p7.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "screenshot_02_tab4_distribution_scrubber.png", 5.8, "Figure 7.1: Tab 4 Population Distribution Donut and Interactive Day Scrubber")
+    add_image_safely(
+        doc,
+        "screenshot_02_tab4_distribution_scrubber.png",
+        5.8,
+        "Figure 7.1: Tab 4 Population Distribution Donut and Interactive Day Scrubber",
+    )
 
     # ==================== CHAPTER 8 ====================
     add_chapter_header(8, "Feature Walkthrough: Dual-Scenario Comparison Engine")
@@ -281,8 +332,18 @@ def build_docx():
         "and Healthcare Capacity Breach Status, clearly illustrating the 'flatten the curve' phenomenon."
     )
     p8.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "screenshot_03_scenario_comparison.png", 5.8, "Figure 8.1: Dual-Scenario Comparison View with 4 KPI Delta Impact Metrics")
-    add_image_safely(doc, "fig_09_scenario_comparison.png", 5.8, "Figure 8.2: Flattening the Curve: Benchmark Comparative Trajectories (Baseline vs Policy)")
+    add_image_safely(
+        doc,
+        "screenshot_03_scenario_comparison.png",
+        5.8,
+        "Figure 8.1: Dual-Scenario Comparison View with 4 KPI Delta Impact Metrics",
+    )
+    add_image_safely(
+        doc,
+        "fig_09_scenario_comparison.png",
+        5.8,
+        "Figure 8.2: Flattening the Curve: Benchmark Comparative Trajectories (Baseline vs Policy)",
+    )
 
     # ==================== CHAPTER 9 ====================
     add_chapter_header(9, "Feature Walkthrough: Data Export, Audit Logging & PDF Reports")
@@ -293,7 +354,12 @@ def build_docx():
         "formal clinical summary reports in PDF format with executive metrics, capacity breach warnings, and comparative tables."
     )
     p9.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "screenshot_04_data_and_reports.png", 5.8, "Figure 9.1: Tab 5 Data & Reports View with 4 Standardized Export Action Triggers")
+    add_image_safely(
+        doc,
+        "screenshot_04_data_and_reports.png",
+        5.8,
+        "Figure 9.1: Tab 5 Data & Reports View with 4 Standardized Export Action Triggers",
+    )
 
     # ==================== CHAPTER 10 ====================
     add_chapter_header(10, "Mathematical Validation & Conservation Law Verification")
@@ -306,7 +372,12 @@ def build_docx():
         "4. Non-negativity Bounds: S(t) ≥ 0, I(t) ≥ 0, R(t) ≥ 0 across entire simulation bounds."
     )
     p10.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_10_phase_space_nullcline.png", 5.8, "Figure 10.1: Phase Space Orbit (S vs I) with Critical Nullcline S* = N/R0")
+    add_image_safely(
+        doc,
+        "fig_10_phase_space_nullcline.png",
+        5.8,
+        "Figure 10.1: Phase Space Orbit (S vs I) with Critical Nullcline S* = N/R0",
+    )
 
     # ==================== CHAPTER 11 ====================
     add_chapter_header(11, "Phase Space Orbit, Equilibrium Points & Sensitivity Analysis")
@@ -318,7 +389,12 @@ def build_docx():
         "enabling robust risk assessment under parametric uncertainty."
     )
     p11.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_11_parameter_sensitivity.png", 5.8, "Figure 11.1: 2D Sensitivity Heatmap of Peak Infection Burden Across β and γ")
+    add_image_safely(
+        doc,
+        "fig_11_parameter_sensitivity.png",
+        5.8,
+        "Figure 11.1: 2D Sensitivity Heatmap of Peak Infection Burden Across β and γ",
+    )
 
     # ==================== CHAPTER 12 ====================
     add_chapter_header(12, "Extended Epidemiological Models (SIRV, SEIR & Spatial Grid)")
@@ -330,7 +406,12 @@ def build_docx():
         "3. Multi-Patch Metapopulation Model: Simulates spatial transmission across coupled geographic nodes via commuter mobility matrices."
     )
     p12.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_12_extended_sirv_model.png", 5.8, "Figure 12.1: Extended Compartmental Flow Architecture: SIRV Model with Active Immunization")
+    add_image_safely(
+        doc,
+        "fig_12_extended_sirv_model.png",
+        5.8,
+        "Figure 12.1: Extended Compartmental Flow Architecture: SIRV Model with Active Immunization",
+    )
 
     # ==================== CHAPTER 13 ====================
     add_chapter_header(13, "Software Quality Assurance & 11-Tier Testing Framework")
@@ -350,7 +431,12 @@ def build_docx():
         "• Tier 11: End-to-End User Acceptance Testing"
     )
     p13.paragraph_format.space_after = Pt(6)
-    add_image_safely(doc, "fig_13_testing_workflow.png", 5.8, "Figure 13.1: 11-Tier Testing Pyramid & Automated Quality Assurance Pipeline")
+    add_image_safely(
+        doc,
+        "fig_13_testing_workflow.png",
+        5.8,
+        "Figure 13.1: 11-Tier Testing Pyramid & Automated Quality Assurance Pipeline",
+    )
 
     # ==================== CHAPTER 14 ====================
     add_chapter_header(14, "Bug Identification, Root Cause Analysis & Resolution Log")
@@ -373,14 +459,54 @@ def build_docx():
         r.font.color.rgb = RGBColor(255, 255, 255)
 
     bugs = [
-        ("BUG-01", "visualizations.py", "Multiple values for yaxis keyword argument in Plotly go.Layout", "Refactored to fig.update_layout() and explicit fig.update_yaxes()"),
-        ("BUG-02", "app.py", "Argument count mismatch in create_scenario_comparison_chart()", "Corrected call signature to pass 2 result objects (r_a, r_b)"),
-        ("BUG-03", "export.py", "AttributeError: capacity_threshold attribute name mismatch", "Updated reference to model.HealthcareCapacityMetrics.capacity_limit"),
-        ("BUG-04", "app.py", "Export buttons misaligned with jagged vertical offsets", "Added unified .stDownloadButton CSS flex container with equal heights"),
-        ("BUG-05", "sir_model.py", "Euler drift on high R0 resulting in non-physical S < 0", "Enforced strict clipping bounds S(t) = max(0, S) and RK45 default"),
-        ("BUG-06", "export.py", "Missing CSV header escaping for special character fields", "Applied RFC-4180 standard escaping using Python csv.writer"),
-        ("BUG-07", "ui_components.py", "KPI metric badge contrast ratio < 4.5:1 on light theme", "Updated badge palette to dark text on pastel tints (#065F46 on #D1FAE5)"),
-        ("BUG-08", "app.py", "Session state contamination between simulation presets", "Implemented clean state initialization dict reset on preset change"),
+        (
+            "BUG-01",
+            "visualizations.py",
+            "Multiple values for yaxis keyword argument in Plotly go.Layout",
+            "Refactored to fig.update_layout() and explicit fig.update_yaxes()",
+        ),
+        (
+            "BUG-02",
+            "app.py",
+            "Argument count mismatch in create_scenario_comparison_chart()",
+            "Corrected call signature to pass 2 result objects (r_a, r_b)",
+        ),
+        (
+            "BUG-03",
+            "export.py",
+            "AttributeError: capacity_threshold attribute name mismatch",
+            "Updated reference to model.HealthcareCapacityMetrics.capacity_limit",
+        ),
+        (
+            "BUG-04",
+            "app.py",
+            "Export buttons misaligned with jagged vertical offsets",
+            "Added unified .stDownloadButton CSS flex container with equal heights",
+        ),
+        (
+            "BUG-05",
+            "sir_model.py",
+            "Euler drift on high R0 resulting in non-physical S < 0",
+            "Enforced strict clipping bounds S(t) = max(0, S) and RK45 default",
+        ),
+        (
+            "BUG-06",
+            "export.py",
+            "Missing CSV header escaping for special character fields",
+            "Applied RFC-4180 standard escaping using Python csv.writer",
+        ),
+        (
+            "BUG-07",
+            "ui_components.py",
+            "KPI metric badge contrast ratio < 4.5:1 on light theme",
+            "Updated badge palette to dark text on pastel tints (#065F46 on #D1FAE5)",
+        ),
+        (
+            "BUG-08",
+            "app.py",
+            "Session state contamination between simulation presets",
+            "Implemented clean state initialization dict reset on preset change",
+        ),
     ]
     for i, row in enumerate(bugs):
         for j, val in enumerate(row):
@@ -445,66 +571,126 @@ def build_docx():
     )
 
     viva_qas = [
-        ("Q1: What is the fundamental assumption of the Kermack-McKendrick SIR model?",
-         "A1: It assumes a closed, homogeneous, well-mixed population of constant size N where every individual has an equal probability of contacting any other individual, with no natural births, deaths, or immigration during the epidemic period."),
-        ("Q2: What is the biological and mathematical definition of R0?",
-         "A2: R0 = β / γ. Biologically, it is the average number of secondary infections generated by a single infectious individual in a completely susceptible population."),
-        ("Q3: Why must dS/dt + dI/dt + dR/dt = 0?",
-         "A3: This expresses the fundamental conservation of mass. Because individuals only transition between compartments without entering or leaving the system, the total population N remains constant for all t."),
-        ("Q4: Under what condition will an epidemic occur (dI/dt > 0)?",
-         "A4: An epidemic occurs if and only if dI/dt > 0 at t=0, which requires β·S0/N - γ > 0. Since S0 ≈ N, this reduces to R0 = β/γ > 1."),
-        ("Q5: What is the Herd Immunity Threshold (HIT) and its formula?",
-         "A5: HIT = 1 - 1/R0. It is the minimum fraction of the population that must be immune so that the effective reproduction rate Rt drops below 1, causing infection incidence to decline."),
-        ("Q6: At what point does the infection peak occur?",
-         "A6: The peak occurs exactly when dI/dt = 0, which corresponds to the critical susceptible threshold S* = γ·N/β = N/R0."),
-        ("Q7: Does an epidemic ever infect 100% of a susceptible population in the SIR model?",
-         "A7: No. The final size relation S_inf = S0 · exp(-R0 · (1 - S_inf/N)) proves that S_inf > 0 strictly, meaning a non-zero susceptible cohort always escapes infection."),
-        ("Q8: Why is SciPy's RK45 preferred over Euler's method?",
-         "A8: Euler's method has O(dt) truncation error and causes numerical instability or unphysical negative populations. RK45 is a 5th-order Runge-Kutta method with adaptive step sizing, achieving high accuracy with bounded error."),
-        ("Q9: What is the meaning of parameter β?",
-         "A9: β is the effective transmission rate, representing the average contact rate per unit time multiplied by the probability of pathogen transmission per contact."),
-        ("Q10: What is the meaning of parameter γ?",
-         "A10: γ is the recovery rate. Its reciprocal, 1/γ, represents the average infectious duration in days."),
-        ("Q11: What is Effective Reproduction Number Rt?",
-         "A11: Rt = R0 · (S(t) / N). It measures transmission potential at time t as the susceptible pool is depleted or protected by interventions."),
-        ("Q12: How does social distancing affect the model?",
-         "A12: Social distancing reduces the contact rate, directly lowering β and therefore reducing R0 and flattening the infection curve."),
-        ("Q13: How does vaccination modify the SIR model?",
-         "A13: Vaccination transfers individuals directly from Susceptible (S) to Recovered/Immune (V or R) without passing through the Infectious compartment (I)."),
-        ("Q14: What is the phase space representation of the SIR model?",
-         "A14: It is the trajectory plotted in (S, I) space, showing the state trajectory independent of time, with maximum I occurring at S = N/R0."),
-        ("Q15: How does EpiSim Pro handle healthcare capacity limits?",
-         "A15: It computes hospitalization and ICU demand as fixed percentages of active infections and evaluates if and when demand exceeds available hospital bed capacity."),
-        ("Q16: How is data exported in EpiSim Pro?",
-         "A16: Time series data is exported to RFC-4180 CSV, parameter metadata to JSON, charts to PNG, and formal clinical reports to PDF using ReportLab."),
-        ("Q17: What testing framework is implemented?",
-         "A17: Pytest is used for 146 automated tests across 11 tiers covering unit math, integration, scenario comparison, exports, and UI components."),
-        ("Q18: What is the code coverage of the test suite?",
-         "A18: The test suite achieves 100% pass rate with high branch coverage across core mathematical and export routines."),
-        ("Q19: How are UI components styled?",
-         "A19: Using custom CSS injection adhering to Slate & Modern Blue design tokens with WCAG 2.1 AA compliant contrast ratios."),
-        ("Q20: What happens if initial infected I0 = 0?",
-         "A20: The system remains in disease-free equilibrium: dS/dt = dI/dt = dR/dt = 0, so no epidemic occurs."),
-        ("Q21: Can R0 be less than 1?",
-         "A21: Yes. If R0 < 1, each infected person infects fewer than one person on average, causing active infections to decay monotonically to zero."),
-        ("Q22: What is the Attack Rate?",
-         "A22: The attack rate is the proportion of the population that becomes infected over the entire course of the epidemic: (N - S_inf) / N = R_inf / N."),
-        ("Q23: How does EpiSim Pro ensure numerical conservation?",
-         "A23: It verifies |S(t) + I(t) + R(t) - N| / N < 1e-6 at every integrated time point."),
-        ("Q24: What is the purpose of the Scenario Comparison Engine?",
-         "A24: It allows side-by-side simulation of a Baseline scenario against an Intervention scenario to evaluate policy effectiveness."),
-        ("Q25: What is the difference between SIR and SEIR models?",
-         "A25: SEIR includes an Exposed (E) compartment for individuals who are infected but not yet infectious during an incubation period."),
-        ("Q26: What is a stiff differential equation?",
-         "A26: A differential equation where certain implicit time scales vary drastically, requiring extremely small step sizes in explicit solvers to maintain stability."),
-        ("Q27: How does EpiSim Pro prevent session state bugs in Streamlit?",
-         "A27: It uses defensive state initialization patterns and explicit session state keys with immutable parameter defaults."),
-        ("Q28: What is the time complexity of the RK45 solver for n time steps?",
-         "A28: It is O(n) with a small constant factor, requiring 6 function evaluations per accepted adaptive step."),
-        ("Q29: How are Plotly charts made accessible?",
-         "A29: By using distinct color palettes, differentiated line dash patterns, hover tooltips, and high-contrast grid lines."),
-        ("Q30: Why is EpiSim Pro suitable for clinical decision support?",
-         "A30: Because it combines rigorous mathematical ODE solvers with clinical capacity thresholds, comparative scenario testing, and automated audit reporting."),
+        (
+            "Q1: What is the fundamental assumption of the Kermack-McKendrick SIR model?",
+            "A1: It assumes a closed, homogeneous, well-mixed population of constant size N where every individual has an equal probability of contacting any other individual, with no natural births, deaths, or immigration during the epidemic period.",
+        ),
+        (
+            "Q2: What is the biological and mathematical definition of R0?",
+            "A2: R0 = β / γ. Biologically, it is the average number of secondary infections generated by a single infectious individual in a completely susceptible population.",
+        ),
+        (
+            "Q3: Why must dS/dt + dI/dt + dR/dt = 0?",
+            "A3: This expresses the fundamental conservation of mass. Because individuals only transition between compartments without entering or leaving the system, the total population N remains constant for all t.",
+        ),
+        (
+            "Q4: Under what condition will an epidemic occur (dI/dt > 0)?",
+            "A4: An epidemic occurs if and only if dI/dt > 0 at t=0, which requires β·S0/N - γ > 0. Since S0 ≈ N, this reduces to R0 = β/γ > 1.",
+        ),
+        (
+            "Q5: What is the Herd Immunity Threshold (HIT) and its formula?",
+            "A5: HIT = 1 - 1/R0. It is the minimum fraction of the population that must be immune so that the effective reproduction rate Rt drops below 1, causing infection incidence to decline.",
+        ),
+        (
+            "Q6: At what point does the infection peak occur?",
+            "A6: The peak occurs exactly when dI/dt = 0, which corresponds to the critical susceptible threshold S* = γ·N/β = N/R0.",
+        ),
+        (
+            "Q7: Does an epidemic ever infect 100% of a susceptible population in the SIR model?",
+            "A7: No. The final size relation S_inf = S0 · exp(-R0 · (1 - S_inf/N)) proves that S_inf > 0 strictly, meaning a non-zero susceptible cohort always escapes infection.",
+        ),
+        (
+            "Q8: Why is SciPy's RK45 preferred over Euler's method?",
+            "A8: Euler's method has O(dt) truncation error and causes numerical instability or unphysical negative populations. RK45 is a 5th-order Runge-Kutta method with adaptive step sizing, achieving high accuracy with bounded error.",
+        ),
+        (
+            "Q9: What is the meaning of parameter β?",
+            "A9: β is the effective transmission rate, representing the average contact rate per unit time multiplied by the probability of pathogen transmission per contact.",
+        ),
+        (
+            "Q10: What is the meaning of parameter γ?",
+            "A10: γ is the recovery rate. Its reciprocal, 1/γ, represents the average infectious duration in days.",
+        ),
+        (
+            "Q11: What is Effective Reproduction Number Rt?",
+            "A11: Rt = R0 · (S(t) / N). It measures transmission potential at time t as the susceptible pool is depleted or protected by interventions.",
+        ),
+        (
+            "Q12: How does social distancing affect the model?",
+            "A12: Social distancing reduces the contact rate, directly lowering β and therefore reducing R0 and flattening the infection curve.",
+        ),
+        (
+            "Q13: How does vaccination modify the SIR model?",
+            "A13: Vaccination transfers individuals directly from Susceptible (S) to Recovered/Immune (V or R) without passing through the Infectious compartment (I).",
+        ),
+        (
+            "Q14: What is the phase space representation of the SIR model?",
+            "A14: It is the trajectory plotted in (S, I) space, showing the state trajectory independent of time, with maximum I occurring at S = N/R0.",
+        ),
+        (
+            "Q15: How does EpiSim Pro handle healthcare capacity limits?",
+            "A15: It computes hospitalization and ICU demand as fixed percentages of active infections and evaluates if and when demand exceeds available hospital bed capacity.",
+        ),
+        (
+            "Q16: How is data exported in EpiSim Pro?",
+            "A16: Time series data is exported to RFC-4180 CSV, parameter metadata to JSON, charts to PNG, and formal clinical reports to PDF using ReportLab.",
+        ),
+        (
+            "Q17: What testing framework is implemented?",
+            "A17: Pytest is used for 146 automated tests across 11 tiers covering unit math, integration, scenario comparison, exports, and UI components.",
+        ),
+        (
+            "Q18: What is the code coverage of the test suite?",
+            "A18: The test suite achieves 100% pass rate with high branch coverage across core mathematical and export routines.",
+        ),
+        (
+            "Q19: How are UI components styled?",
+            "A19: Using custom CSS injection adhering to Slate & Modern Blue design tokens with WCAG 2.1 AA compliant contrast ratios.",
+        ),
+        (
+            "Q20: What happens if initial infected I0 = 0?",
+            "A20: The system remains in disease-free equilibrium: dS/dt = dI/dt = dR/dt = 0, so no epidemic occurs.",
+        ),
+        (
+            "Q21: Can R0 be less than 1?",
+            "A21: Yes. If R0 < 1, each infected person infects fewer than one person on average, causing active infections to decay monotonically to zero.",
+        ),
+        (
+            "Q22: What is the Attack Rate?",
+            "A22: The attack rate is the proportion of the population that becomes infected over the entire course of the epidemic: (N - S_inf) / N = R_inf / N.",
+        ),
+        (
+            "Q23: How does EpiSim Pro ensure numerical conservation?",
+            "A23: It verifies |S(t) + I(t) + R(t) - N| / N < 1e-6 at every integrated time point.",
+        ),
+        (
+            "Q24: What is the purpose of the Scenario Comparison Engine?",
+            "A24: It allows side-by-side simulation of a Baseline scenario against an Intervention scenario to evaluate policy effectiveness.",
+        ),
+        (
+            "Q25: What is the difference between SIR and SEIR models?",
+            "A25: SEIR includes an Exposed (E) compartment for individuals who are infected but not yet infectious during an incubation period.",
+        ),
+        (
+            "Q26: What is a stiff differential equation?",
+            "A26: A differential equation where certain implicit time scales vary drastically, requiring extremely small step sizes in explicit solvers to maintain stability.",
+        ),
+        (
+            "Q27: How does EpiSim Pro prevent session state bugs in Streamlit?",
+            "A27: It uses defensive state initialization patterns and explicit session state keys with immutable parameter defaults.",
+        ),
+        (
+            "Q28: What is the time complexity of the RK45 solver for n time steps?",
+            "A28: It is O(n) with a small constant factor, requiring 6 function evaluations per accepted adaptive step.",
+        ),
+        (
+            "Q29: How are Plotly charts made accessible?",
+            "A29: By using distinct color palettes, differentiated line dash patterns, hover tooltips, and high-contrast grid lines.",
+        ),
+        (
+            "Q30: Why is EpiSim Pro suitable for clinical decision support?",
+            "A30: Because it combines rigorous mathematical ODE solvers with clinical capacity thresholds, comparative scenario testing, and automated audit reporting.",
+        ),
     ]
 
     for q, a in viva_qas:

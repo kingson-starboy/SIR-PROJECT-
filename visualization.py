@@ -25,7 +25,60 @@ COLOR_SURFACE = "#FFFFFF"  # Pure White Card Surface
 COLOR_BACKGROUND = "#F7F8FA"  # Canvas Neutral Tint
 COLOR_ACCENT_PURPLE = "#7C3AED"  # Analytical Violet
 
-# Common Chart Layout Defaults
+
+# Compartment-specific comparison chart (S, I, or R) for two scenarios
+def create_compartment_comparison_chart(
+    r_a: SIRSimulationResult, r_b: SIRSimulationResult, compartment: str
+) -> go.Figure:
+    """Return a Plotly figure comparing a single compartment between two scenarios.
+
+    * ``compartment`` must be one of ``"S"``, ``"I"`` or ``"R"``.
+    The function uses the same colour palette as the full SIR curve chart.
+    """
+    comp_map = {
+        "S": (r_a.S, r_b.S, COLOR_SUSCEPTIBLE, "Susceptible"),
+        "I": (r_a.I, r_b.I, COLOR_INFECTED, "Infected"),
+        "R": (r_a.R, r_b.R, COLOR_RECOVERED, "Recovered"),
+    }
+    if compartment not in comp_map:
+        raise ValueError("compartment must be one of 'S', 'I', 'R'")
+    a_vals, b_vals, color, label = comp_map[compartment]
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=r_a.t,
+            y=a_vals,
+            name="Scenario A (Baseline)",
+            mode="lines",
+            line=dict(color=color, width=2.8),
+            hovertemplate=f"<b>Scenario A {label}:</b> %{{y:,.0f}}<extra></extra>",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=r_b.t,
+            y=b_vals,
+            name="Scenario B (Intervention)",
+            mode="lines",
+            line=dict(color=color, width=2.8, dash="dash"),
+            hovertemplate=f"<b>Scenario B {label}:</b> %{{y:,.0f}}<extra></extra>",
+        )
+    )
+    fig.update_layout(
+        **CHART_LAYOUT_DEFAULTS,
+        title=dict(
+            text=f"<b>{label} Compartment</b>",
+            font=dict(size=14, color="#0F172A"),
+            x=0.01,
+            y=0.90,
+        ),
+        xaxis_title="Time (Days)",
+        yaxis_title=f"{label} Count",
+        showlegend=True,
+    )
+    return fig
+
+
 def get_chart_layout(is_dark: bool = False) -> dict:
     """Return layout dictionary customized for Light or Dark theme."""
     if is_dark:
@@ -58,11 +111,11 @@ def get_chart_layout(is_dark: bool = False) -> dict:
         paper_bgcolor=bg,
         plot_bgcolor=plot_bg,
         hovermode="x unified",
-        margin=dict(l=60, r=30, t=75, b=65),
+        margin=dict(l=60, r=30, t=88, b=80),
         legend=dict(
             orientation="h",
             yanchor="top",
-            y=-0.16,
+            y=-0.22,
             xanchor="center",
             x=0.5,
             bgcolor=legend_bg,

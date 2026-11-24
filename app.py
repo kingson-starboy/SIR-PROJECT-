@@ -36,13 +36,13 @@ from validation import validate_sir_inputs
 from visualization import (
     apply_theme_to_figure,
     create_animated_progression_chart,
+    create_compartment_comparison_chart,
     create_effective_r_chart,
     create_infection_rate_trend_chart,
     create_model_vs_data_chart,
     create_peak_analysis_chart,
     create_phase_space_chart,
     create_population_distribution_chart,
-    create_scenario_comparison_chart,
     create_sensitivity_chart,
     create_sir_curve_chart,
 )
@@ -233,12 +233,14 @@ st.markdown(
     }}
     .hero-stats-strip {{
         display: flex;
-        gap: 16px;
+        flex-wrap: wrap;
+        gap: 10px;
         align-items: center;
+        flex-shrink: 0;
         background: {c_surface};
         border: 1px solid {c_border};
         border-radius: 10px;
-        padding: 8px 16px;
+        padding: 8px 14px;
     }}
     .hero-stat-item {{
         display: flex;
@@ -247,6 +249,10 @@ st.markdown(
         font-size: 0.75rem;
         font-weight: 600;
         color: {c_text_muted};
+        white-space: nowrap;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: {"rgba(255, 255, 255, 0.04)" if is_dark else "rgba(15, 23, 42, 0.03)"};
     }}
     .hero-stat-item b {{
         color: {c_text_main};
@@ -745,7 +751,10 @@ if nav_selection == "Live Dashboard":
     col_p1, col_p2, col_p3 = st.columns([1, 1, 1])
 
     with col_p1:
-        st.markdown("<p style='font-size:0.80rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;'>🧬 Pathogen Transmission Dynamics</p>", unsafe_allow_html=True)
+        st.markdown(
+            "<p style='font-size:0.80rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;'>🧬 Pathogen Transmission Dynamics</p>",
+            unsafe_allow_html=True,
+        )
         preset_choice = st.selectbox(
             "Scenario Preset",
             ["Custom Configuration"] + list(PRESETS.keys()),
@@ -782,10 +791,16 @@ if nav_selection == "Live Dashboard":
         )
         # R0 preview tag
         r0_calc = inp_beta / inp_gamma if inp_gamma > 0 else 0.0
-        st.markdown(f"<div style='font-size:0.75rem; color:{c_text_muted}; margin-top:-6px;'>Theoretical R₀ = <b>{r0_calc:.2f}</b> • Mean Infectious Duration: <b>{1/inp_gamma:.1f} days</b></div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:0.75rem; color:{c_text_muted}; margin-top:-6px;'>Theoretical R₀ = <b>{r0_calc:.2f}</b> • Mean Infectious Duration: <b>{1 / inp_gamma:.1f} days</b></div>",
+            unsafe_allow_html=True,
+        )
 
     with col_p2:
-        st.markdown("<p style='font-size:0.80rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;'>👥 Host Demographics & Capacity</p>", unsafe_allow_html=True)
+        st.markdown(
+            "<p style='font-size:0.80rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;'>👥 Host Demographics & Capacity</p>",
+            unsafe_allow_html=True,
+        )
         inp_n = st.number_input(
             "Total Population (N)",
             min_value=100,
@@ -823,10 +838,16 @@ if nav_selection == "Live Dashboard":
             help="Designated healthcare surge capacity threshold.",
         )
         capacity_beds = (inp_cap_pct / 100.0) * inp_n
-        st.markdown(f"<div style='font-size:0.75rem; color:{c_text_muted}; margin-top:-6px;'>Available ICU Beds: <b>{capacity_beds:,.0f} beds</b></div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:0.75rem; color:{c_text_muted}; margin-top:-6px;'>Available ICU Beds: <b>{capacity_beds:,.0f} beds</b></div>",
+            unsafe_allow_html=True,
+        )
 
     with col_p3:
-        st.markdown("<p style='font-size:0.80rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;'>🛡️ Intervention & Horizon</p>", unsafe_allow_html=True)
+        st.markdown(
+            "<p style='font-size:0.80rem; font-weight:700; text-transform:uppercase; margin-bottom:6px;'>🛡️ Intervention & Horizon</p>",
+            unsafe_allow_html=True,
+        )
         inp_dur = st.number_input(
             "Time Horizon (Days)",
             min_value=10,
@@ -932,7 +953,13 @@ if nav_selection == "Live Dashboard":
             "displayModeBar": True,
             "displaylogo": False,
             "modeBarButtonsToRemove": ["lasso2d", "select2d"],
-            "toImageButtonOptions": {"format": "png", "filename": "episim_plot", "height": 600, "width": 1000, "scale": 2},
+            "toImageButtonOptions": {
+                "format": "png",
+                "filename": "episim_plot",
+                "height": 600,
+                "width": 1000,
+                "scale": 2,
+            },
         }
 
         # 8 High-Resolution Visualization Tabs
@@ -950,30 +977,64 @@ if nav_selection == "Live Dashboard":
         )
 
         with tab_sir:
-            st.plotly_chart(apply_theme_to_figure(create_sir_curve_chart(sim), is_dark), use_container_width=True, config=chart_config)
+            st.plotly_chart(
+                apply_theme_to_figure(create_sir_curve_chart(sim), is_dark),
+                use_container_width=True,
+                config=chart_config,
+            )
 
         with tab_peak:
-            st.plotly_chart(apply_theme_to_figure(create_peak_analysis_chart(sim, summ, show_capacity=True), is_dark), use_container_width=True, config=chart_config)
+            st.plotly_chart(
+                apply_theme_to_figure(create_peak_analysis_chart(sim, summ, show_capacity=True), is_dark),
+                use_container_width=True,
+                config=chart_config,
+            )
 
         with tab_phase:
-            st.plotly_chart(apply_theme_to_figure(create_phase_space_chart(sim, summ), is_dark), use_container_width=True, config=chart_config)
+            st.plotly_chart(
+                apply_theme_to_figure(create_phase_space_chart(sim, summ), is_dark),
+                use_container_width=True,
+                config=chart_config,
+            )
 
         with tab_donut:
             col_dn1, col_dn2 = st.columns([1, 1])
             with col_dn1:
-                st.plotly_chart(apply_theme_to_figure(create_population_distribution_chart(summ, sim.parameters.total_population), is_dark), use_container_width=True, config=chart_config)
+                st.plotly_chart(
+                    apply_theme_to_figure(
+                        create_population_distribution_chart(summ, sim.parameters.total_population), is_dark
+                    ),
+                    use_container_width=True,
+                    config=chart_config,
+                )
             with col_dn2:
-                st.plotly_chart(apply_theme_to_figure(create_animated_progression_chart(sim), is_dark), use_container_width=True, config=chart_config)
+                st.plotly_chart(
+                    apply_theme_to_figure(create_animated_progression_chart(sim), is_dark),
+                    use_container_width=True,
+                    config=chart_config,
+                )
 
         with tab_rate:
-            st.plotly_chart(apply_theme_to_figure(create_infection_rate_trend_chart(sim), is_dark), use_container_width=True, config=chart_config)
+            st.plotly_chart(
+                apply_theme_to_figure(create_infection_rate_trend_chart(sim), is_dark),
+                use_container_width=True,
+                config=chart_config,
+            )
 
         with tab_re:
-            st.plotly_chart(apply_theme_to_figure(create_effective_r_chart(sim, summ), is_dark), use_container_width=True, config=chart_config)
+            st.plotly_chart(
+                apply_theme_to_figure(create_effective_r_chart(sim, summ), is_dark),
+                use_container_width=True,
+                config=chart_config,
+            )
 
         with tab_sens:
             sens_items = compute_parameter_sensitivity(sim.parameters)
-            st.plotly_chart(apply_theme_to_figure(create_sensitivity_chart(sens_items), is_dark), use_container_width=True, config=chart_config)
+            st.plotly_chart(
+                apply_theme_to_figure(create_sensitivity_chart(sens_items), is_dark),
+                use_container_width=True,
+                config=chart_config,
+            )
 
         with tab_calib:
             st.markdown("##### Empirical Case Data vs. Simulated Continuous Trajectory")
@@ -1017,9 +1078,15 @@ if nav_selection == "Live Dashboard":
                 with col_f3:
                     st.metric("Correlation Coefficient (R²)", f"{fit_metrics['r_squared']:.3f}")
 
-                st.plotly_chart(apply_theme_to_figure(create_model_vs_data_chart(sim, h_df, fit_metrics), is_dark), use_container_width=True, config=chart_config)
+                st.plotly_chart(
+                    apply_theme_to_figure(create_model_vs_data_chart(sim, h_df, fit_metrics), is_dark),
+                    use_container_width=True,
+                    config=chart_config,
+                )
             else:
-                st.info("💡 Upload a CSV file or click 'Load Reference Wave Dataset' to compare against empirical observations.")
+                st.info(
+                    "💡 Upload a CSV file or click 'Load Reference Wave Dataset' to compare against empirical observations."
+                )
 
         st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
 
@@ -1141,7 +1208,9 @@ elif nav_selection == "Scenario Comparison":
             """,
             unsafe_allow_html=True,
         )
-        sc_a_n = st.number_input("Population N (Scenario A)", min_value=100, value=100000, step=5000, key="ca_n")
+        sc_a_n = st.number_input(
+            "Population N (Scenario A)", min_value=100, value=100000, step=5000, key="ca_n"
+        )
         sc_a_i0 = st.number_input("Initial Infected I(0)", min_value=1, value=50, key="ca_i0")
         sc_a_beta = st.slider("Transmission Rate β", 0.05, 1.50, 0.40, 0.01, key="ca_b")
         sc_a_gamma = st.slider("Recovery Rate γ", 0.02, 0.50, 0.12, 0.01, key="ca_g")
@@ -1156,7 +1225,9 @@ elif nav_selection == "Scenario Comparison":
             """,
             unsafe_allow_html=True,
         )
-        sc_b_n = st.number_input("Population N (Scenario B)", min_value=100, value=100000, step=5000, key="cb_n")
+        sc_b_n = st.number_input(
+            "Population N (Scenario B)", min_value=100, value=100000, step=5000, key="cb_n"
+        )
         sc_b_i0 = st.number_input("Initial Infected I(0)", min_value=1, value=50, key="cb_i0")
         sc_b_beta = st.slider("Transmission Rate β (Mitigated)", 0.05, 1.50, 0.22, 0.01, key="cb_b")
         sc_b_gamma = st.slider("Recovery Rate γ", 0.02, 0.50, 0.12, 0.01, key="cb_g")
@@ -1165,12 +1236,18 @@ elif nav_selection == "Scenario Comparison":
 
     btn_compare = st.button("⚖️ Run Comparative Simulation", type="primary", use_container_width=True)
 
-    r_a, s_a, _, _ = cached_solve_sir(sc_a_n, sc_a_i0, 0, sc_a_beta, sc_a_gamma, sc_a_dur, 1000, 0.10 * sc_a_n)
-    r_b, s_b, _, _ = cached_solve_sir(sc_b_n, sc_b_i0, 0, sc_b_beta, sc_b_gamma, sc_b_dur, 1000, 0.10 * sc_b_n)
+    r_a, s_a, _, _ = cached_solve_sir(
+        sc_a_n, sc_a_i0, 0, sc_a_beta, sc_a_gamma, sc_a_dur, 1000, 0.10 * sc_a_n
+    )
+    r_b, s_b, _, _ = cached_solve_sir(
+        sc_b_n, sc_b_i0, 0, sc_b_beta, sc_b_gamma, sc_b_dur, 1000, 0.10 * sc_b_n
+    )
 
     if r_a is not None and r_b is not None and s_a is not None and s_b is not None:
         peak_diff = s_b.peak.peak_infections - s_a.peak.peak_infections
-        peak_diff_pct = (peak_diff / s_a.peak.peak_infections) * 100.0 if s_a.peak.peak_infections > 0 else 0.0
+        peak_diff_pct = (
+            (peak_diff / s_a.peak.peak_infections) * 100.0 if s_a.peak.peak_infections > 0 else 0.0
+        )
         day_diff = s_b.peak.peak_day - s_a.peak.peak_day
         attack_diff = s_b.final_stats.percent_affected - s_a.final_stats.percent_affected
 
@@ -1207,14 +1284,34 @@ elif nav_selection == "Scenario Comparison":
             "displaylogo": False,
             "modeBarButtonsToRemove": ["lasso2d", "select2d"],
         }
-        st.plotly_chart(
-            apply_theme_to_figure(
-                create_scenario_comparison_chart(r_a, r_b, "Scenario A (Baseline)", "Scenario B (Intervention)"),
-                is_dark,
-            ),
-            use_container_width=True,
-            config=chart_config,
-        )
+        col_s, col_i, col_r = st.columns(3)
+        with col_s:
+            st.plotly_chart(
+                apply_theme_to_figure(
+                    create_compartment_comparison_chart(r_a, r_b, "S"),
+                    is_dark,
+                ),
+                use_container_width=True,
+                config=chart_config,
+            )
+        with col_i:
+            st.plotly_chart(
+                apply_theme_to_figure(
+                    create_compartment_comparison_chart(r_a, r_b, "I"),
+                    is_dark,
+                ),
+                use_container_width=True,
+                config=chart_config,
+            )
+        with col_r:
+            st.plotly_chart(
+                apply_theme_to_figure(
+                    create_compartment_comparison_chart(r_a, r_b, "R"),
+                    is_dark,
+                ),
+                use_container_width=True,
+                config=chart_config,
+            )
 
 
 def render_styled_dataframe(df: pd.DataFrame, is_dark_mode: bool = False) -> None:
@@ -1254,7 +1351,7 @@ def render_styled_dataframe(df: pd.DataFrame, is_dark_mode: bool = False) -> Non
                 <tr>{headers_html}</tr>
             </thead>
             <tbody>
-                {''.join(rows_html)}
+                {"".join(rows_html)}
             </tbody>
         </table>
     </div>
