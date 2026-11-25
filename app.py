@@ -8,6 +8,9 @@ symmetric diagnostic telemetry, and publication-grade Plotly visual analytics.
 
 from __future__ import annotations
 
+import base64
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -48,14 +51,39 @@ from visualization import (
 )
 
 # -----------------------------------------------------------------------------
-# 1. STREAMLIT PAGE CONFIGURATION
+# 1. LOGO & BRANDING ASSETS
+# -----------------------------------------------------------------------------
+LOGO_PNG_PATH = Path(__file__).resolve().parent / "assets" / "sir_logo.png"
+LOGO_SVG_PATH = Path(__file__).resolve().parent / "assets" / "sir_logo.svg"
+
+page_icon_val = str(LOGO_PNG_PATH) if LOGO_PNG_PATH.exists() else "📈"
+
+if LOGO_SVG_PATH.exists():
+    with open(LOGO_SVG_PATH, "rb") as f_logo:
+        _svg_b64 = base64.b64encode(f_logo.read()).decode("utf-8")
+        LOGO_DATA_URI = f"data:image/svg+xml;base64,{_svg_b64}"
+elif LOGO_PNG_PATH.exists():
+    with open(LOGO_PNG_PATH, "rb") as f_logo:
+        _png_b64 = base64.b64encode(f_logo.read()).decode("utf-8")
+        LOGO_DATA_URI = f"data:image/png;base64,{_png_b64}"
+else:
+    LOGO_DATA_URI = ""
+
+# -----------------------------------------------------------------------------
+# 2. STREAMLIT PAGE CONFIGURATION
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="EpiSim | Disease Dynamics & Capacity Intelligence",
-    page_icon="📈",
+    page_title="SIR | Disease Dynamics & Capacity Intelligence",
+    page_icon=page_icon_val,
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+if LOGO_PNG_PATH.exists() and hasattr(st, "logo"):
+    try:
+        st.logo(str(LOGO_PNG_PATH), icon_image=str(LOGO_PNG_PATH))
+    except Exception:
+        pass
 
 # Initialize Session State Theme (Default: Light Mode)
 if "theme" not in st.session_state:
@@ -224,6 +252,24 @@ st.markdown(
         background: {c_primary_gradient};
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+    }}
+    .hero-title b, .hero-title strong, .brand-sir {{
+        font-weight: 900 !important;
+        letter-spacing: 0.02em;
+        color: #38BDF8 !important;
+        -webkit-text-fill-color: #38BDF8 !important;
+        text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }}
+    .hero-brand-logo {{
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35);
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }}
+    .hero-brand-logo:hover {{
+        transform: scale(1.05);
     }}
     .hero-sub {{
         font-size: 0.88rem;
@@ -656,11 +702,21 @@ if "historical_df" not in st.session_state:
 # 4. SIDEBAR NAVIGATION & THEME CONTROLS (MINIMALIST & DECOUPLED)
 # -----------------------------------------------------------------------------
 with st.sidebar:
+    sidebar_logo_html = (
+        f'<img src="{LOGO_DATA_URI}" width="42" height="42" style="border-radius: 10px; box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35); flex-shrink: 0;" alt="SIR Logo" />'
+        if LOGO_DATA_URI
+        else '<span style="font-size: 1.8rem;">🧬</span>'
+    )
     st.markdown(
-        """
-        <div style="padding: 12px 0 16px 0; border-bottom: 1px solid rgba(148, 163, 184, 0.2); margin-bottom: 16px;">
-            <div style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em;">EpiSim Intelligence</div>
-            <div style="font-size: 0.74rem; color: #64748B; font-weight: 600;">Epidemiological Decision Platform</div>
+        f"""
+        <div style="padding: 10px 0 16px 0; border-bottom: 1px solid rgba(148, 163, 184, 0.2); margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+            {sidebar_logo_html}
+            <div>
+                <div style="font-size: 1.25rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1.15;">
+                    <span style="color: #38BDF8; font-weight: 900; letter-spacing: 0.04em;">SIR</span> <span style="font-weight: 800; color: {c_text_main};">PROJECT</span>
+                </div>
+                <div style="font-size: 0.72rem; color: {c_text_muted}; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;">EpiSim Intelligence</div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -707,7 +763,7 @@ with st.sidebar:
     st.markdown(
         """
         <div style="margin-top: 24px; font-size: 0.72rem; color: #64748B; line-height: 1.4;">
-            <b>EpiSim Pro v2.4</b><br>
+            <b>SIR Project v2.4</b><br>
             Kermack-McKendrick ODE Formulation<br>
             Verified 146 Automated Tests (100%)
         </div>
@@ -720,17 +776,24 @@ with st.sidebar:
 # 5. VIEW 1: LIVE DASHBOARD
 # -----------------------------------------------------------------------------
 if nav_selection == "Live Dashboard":
-    # NexafoTech-Inspired Hero Header with Beacon Badge and Stats Strip
+    hero_logo_html = (
+        f'<img src="{LOGO_DATA_URI}" class="hero-brand-logo" alt="SIR Logo" />'
+        if LOGO_DATA_URI
+        else '<span style="font-size: 2.2rem;">🧬</span>'
+    )
     st.markdown(
-        """
+        f"""
         <div class="hero-header">
-            <div>
-                <div class="hero-badge">
-                    <span class="hero-dot"></span>
-                    <span>Adaptive RK45 Differential Engine Active</span>
+            <div style="display: flex; align-items: center; gap: 18px;">
+                {hero_logo_html}
+                <div>
+                    <div class="hero-badge">
+                        <span class="hero-dot"></span>
+                        <span>Adaptive RK45 Differential Engine Active</span>
+                    </div>
+                    <div class="hero-title"><span class="brand-sir">SIR</span> Disease Spread Prediction & Capacity Intelligence</div>
+                    <div class="hero-sub">High-precision Kermack-McKendrick epidemiological differential equations, healthcare bed capacity forecasting, and policy analytics.</div>
                 </div>
-                <div class="hero-title">Disease Spread Prediction & Capacity Intelligence</div>
-                <div class="hero-sub">High-precision Kermack-McKendrick SIR numerical simulations, healthcare bed capacity forecasting, and policy analytics.</div>
             </div>
             <div class="hero-stats-strip">
                 <div class="hero-stat-item">⚡ <b>&lt;5ms</b> Latency</div>
@@ -1189,16 +1252,24 @@ if nav_selection == "Live Dashboard":
 # 6. VIEW 2: SCENARIO COMPARISON STUDIO
 # -----------------------------------------------------------------------------
 elif nav_selection == "Scenario Comparison":
+    hero_logo_html = (
+        f'<img src="{LOGO_DATA_URI}" class="hero-brand-logo" alt="SIR Logo" />'
+        if LOGO_DATA_URI
+        else '<span style="font-size: 2.2rem;">🧬</span>'
+    )
     st.markdown(
-        """
+        f"""
         <div class="hero-header">
-            <div>
-                <div class="hero-badge">
-                    <span class="hero-dot"></span>
-                    <span>Dual Policy Simulation Lab</span>
+            <div style="display: flex; align-items: center; gap: 18px;">
+                {hero_logo_html}
+                <div>
+                    <div class="hero-badge">
+                        <span class="hero-dot"></span>
+                        <span>Dual Policy Simulation Lab</span>
+                    </div>
+                    <div class="hero-title"><span class="brand-sir">SIR</span> Comparative Policy & Intervention Studio</div>
+                    <div class="hero-sub">Simulate and evaluate two distinct epidemiological policy scenarios side-by-side to quantify intervention efficacy.</div>
                 </div>
-                <div class="hero-title">Comparative Policy & Intervention Studio</div>
-                <div class="hero-sub">Simulate and evaluate two distinct epidemiological policy scenarios side-by-side to quantify intervention efficacy.</div>
             </div>
             <div class="hero-stats-strip">
                 <div class="hero-stat-item">⚖️ <b>Dual-Trajectory</b> Analysis</div>
@@ -1363,16 +1434,24 @@ def render_styled_dataframe(df: pd.DataFrame, is_dark_mode: bool = False) -> Non
 # 7. VIEW 3: DATA & REPORTS (CLEAN TELEMETRY HUB)
 # -----------------------------------------------------------------------------
 if nav_selection == "Data & Reports":
+    hero_logo_html = (
+        f'<img src="{LOGO_DATA_URI}" class="hero-brand-logo" alt="SIR Logo" />'
+        if LOGO_DATA_URI
+        else '<span style="font-size: 2.2rem;">🧬</span>'
+    )
     st.markdown(
-        """
+        f"""
         <div class="hero-header">
-            <div>
-                <div class="hero-badge">
-                    <span class="hero-dot"></span>
-                    <span>Scientific Deliverables & Exports</span>
+            <div style="display: flex; align-items: center; gap: 18px;">
+                {hero_logo_html}
+                <div>
+                    <div class="hero-badge">
+                        <span class="hero-dot"></span>
+                        <span>Scientific Deliverables & Exports</span>
+                    </div>
+                    <div class="hero-title"><span class="brand-sir">SIR</span> Data Export & Clinical Telemetry Center</div>
+                    <div class="hero-sub">Export numerical trajectory datasets, machine-readable JSON metadata, and formal PDF project reports.</div>
                 </div>
-                <div class="hero-title">Data Export & Clinical Telemetry Center</div>
-                <div class="hero-sub">Export numerical trajectory datasets, machine-readable JSON metadata, and formal PDF project reports.</div>
             </div>
             <div class="hero-stats-strip">
                 <div class="hero-stat-item">📁 <b>RFC-4180</b> CSV</div>
