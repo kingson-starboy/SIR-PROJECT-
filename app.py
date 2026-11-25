@@ -36,13 +36,13 @@ from validation import validate_sir_inputs
 from visualization import (
     apply_theme_to_figure,
     create_animated_progression_chart,
-    create_compartment_comparison_chart,
     create_effective_r_chart,
     create_infection_rate_trend_chart,
     create_model_vs_data_chart,
     create_peak_analysis_chart,
     create_phase_space_chart,
     create_population_distribution_chart,
+    create_scenario_comparison_chart,
     create_sensitivity_chart,
     create_sir_curve_chart,
 )
@@ -348,6 +348,17 @@ st.markdown(
     .badge-green  {{ background: {"rgba(16, 185, 129, 0.15)" if is_dark else "#ECFDF5"}; color: {"#6EE7B7" if is_dark else "#065F46"}; }}
 
     /* SYMMETRIC DIAGNOSTIC SPEC GRID */
+    [data-testid="stPlotlyChart"] {{
+        background: {c_surface};
+        border: 1px solid {c_border};
+        border-radius: 12px;
+        padding: 12px 10px 6px 10px;
+        box-shadow: {c_card_shadow};
+    }}
+    [data-testid="stPlotlyChart"] .modebar-container {{
+        top: 4px !important;
+        right: 36px !important;
+    }}
     .spec-card {{
         background: {c_surface};
         border: 1px solid {c_border};
@@ -1283,35 +1294,24 @@ elif nav_selection == "Scenario Comparison":
             "displayModeBar": True,
             "displaylogo": False,
             "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+            "toImageButtonOptions": {
+                "format": "png",
+                "filename": "episim_comparison",
+                "height": 600,
+                "width": 1100,
+                "scale": 2,
+            },
         }
-        col_s, col_i, col_r = st.columns(3)
-        with col_s:
-            st.plotly_chart(
-                apply_theme_to_figure(
-                    create_compartment_comparison_chart(r_a, r_b, "S"),
-                    is_dark,
+        st.plotly_chart(
+            apply_theme_to_figure(
+                create_scenario_comparison_chart(
+                    r_a, r_b, "Scenario A (Baseline)", "Scenario B (Intervention)"
                 ),
-                use_container_width=True,
-                config=chart_config,
-            )
-        with col_i:
-            st.plotly_chart(
-                apply_theme_to_figure(
-                    create_compartment_comparison_chart(r_a, r_b, "I"),
-                    is_dark,
-                ),
-                use_container_width=True,
-                config=chart_config,
-            )
-        with col_r:
-            st.plotly_chart(
-                apply_theme_to_figure(
-                    create_compartment_comparison_chart(r_a, r_b, "R"),
-                    is_dark,
-                ),
-                use_container_width=True,
-                config=chart_config,
-            )
+                is_dark,
+            ),
+            use_container_width=True,
+            config=chart_config,
+        )
 
 
 def render_styled_dataframe(df: pd.DataFrame, is_dark_mode: bool = False) -> None:
