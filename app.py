@@ -876,9 +876,22 @@ def render_styled_dataframe(df: pd.DataFrame, is_dark_mode: bool = False) -> Non
     for idx, row in df.iterrows():
         bg = row_alt if idx % 2 == 1 else row_base
         cells = []
-        for val in row:
+        for col_name, val in zip(df.columns, row):
+            col_lower = str(col_name).lower()
             if isinstance(val, (float, np.floating)):
-                formatted_val = f"{val:,.4f}" if abs(val) < 1000 else f"{val:,.0f}"
+                if abs(val - round(val)) < 1e-4:
+                    formatted_val = f"{int(round(val)):,}"
+                elif "day" in col_lower:
+                    formatted_val = f"{val:.1f}" if abs(val - round(val)) >= 0.05 else f"{int(round(val))}"
+                elif any(
+                    k in col_lower
+                    for k in ["susceptible", "infected", "recovered", "population", "cases", "beds"]
+                ):
+                    formatted_val = f"{round(val):,}"
+                elif abs(val) < 0.01 and val != 0:
+                    formatted_val = f"{val:.2e}"
+                else:
+                    formatted_val = f"{val:,.2f}"
             elif isinstance(val, (int, np.integer)):
                 formatted_val = f"{val:,}"
             else:
@@ -2197,11 +2210,25 @@ elif nav_selection == "Data & Reports":
         st.markdown(
             f"""
             <div style="background:{c_surface}; border:1px solid {c_border}; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:{c_card_shadow};">
-                <div style="font-size:0.95rem; font-weight:700; color:{c_text_main}; margin-bottom:14px;">📊 Numerical Trajectory Time Series Data (First 10 Rows)</div>
+                <div style="font-size:0.95rem; font-weight:700; color:{c_text_main}; margin-bottom:14px;">📊 Daily Trajectory Time Series Data (Days 0 to 9)</div>
             """,
             unsafe_allow_html=True,
         )
-        render_styled_dataframe(df_export.head(10), is_dark_mode=is_dark)
+        max_preview_days = min(10, int(sim.parameters.duration_days) + 1)
+        sample_days = np.arange(0, max_preview_days)
+        s_interp = np.interp(sample_days, sim.t, sim.S)
+        i_interp = np.interp(sample_days, sim.t, sim.I)
+        r_interp = np.interp(sample_days, sim.t, sim.R)
+        df_preview = pd.DataFrame(
+            {
+                "Day": [f"Day {int(d)}" for d in sample_days],
+                "Susceptible (S)": np.round(s_interp).astype(int),
+                "Infected (I)": np.round(i_interp).astype(int),
+                "Recovered (R)": np.round(r_interp).astype(int),
+                "Total Population (N)": np.round(s_interp + i_interp + r_interp).astype(int),
+            }
+        )
+        render_styled_dataframe(df_preview, is_dark_mode=is_dark)
         st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("#### Export Scientific Deliverables")
