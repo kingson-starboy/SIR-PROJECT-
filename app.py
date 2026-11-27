@@ -219,6 +219,8 @@ st.markdown(
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
         padding: 10px 0 18px 0;
         border-bottom: 1px solid {c_border};
         margin-bottom: 20px;
@@ -1085,7 +1087,7 @@ if nav_selection == "Live Dashboard":
     st.markdown(
         f"""
         <div class="hero-header">
-            <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 320px;">
                 {hero_logo_html}
                 <div>
                     <div class="hero-badge">
@@ -1625,7 +1627,7 @@ elif nav_selection == "Scenario Comparison":
     st.markdown(
         f"""
         <div class="hero-header">
-            <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 320px;">
                 {hero_logo_html}
                 <div>
                     <div class="hero-badge">
@@ -1762,21 +1764,19 @@ elif nav_selection == "Model Explorer":
     st.markdown(
         f"""
         <div class="hero-header">
-            <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 320px;">
                 {hero_logo_html}
                 <div>
                     <div class="hero-badge">
                         <span class="hero-dot"></span>
-                        <span>Interactive Pathogen Library & Theoretical Atlas</span>
+                        <span>Interactive Pathogen Library</span>
                     </div>
                     <div class="hero-title"><span class="brand-sir">SIR</span> Model Explorer & Dynamics Atlas</div>
                     <div class="hero-sub">Explore historical benchmark pathogens, visual compartmental pipelines, and the fundamental mathematical laws of epidemic control.</div>
                 </div>
             </div>
             <div class="hero-stats-strip">
-                <div class="hero-stat-item">🦠 <b>6</b> Pathogen Presets</div>
-                <div class="hero-stat-item">📐 <b>3</b> Golden Laws</div>
-                <div class="hero-stat-item">📉 <b>Policy</b> Matrix</div>
+                <div class="hero-stat-item">🦠 <b>6 Pathogen</b> Archetypes</div>
                 <div class="hero-stat-item">⚡ <b>RK45</b> Solver</div>
             </div>
         </div>
@@ -2177,7 +2177,7 @@ elif nav_selection == "Data & Reports":
     st.markdown(
         f"""
         <div class="hero-header">
-            <div style="display: flex; align-items: center; gap: 18px;">
+            <div style="display: flex; align-items: center; gap: 18px; flex: 1; min-width: 320px;">
                 {hero_logo_html}
                 <div>
                     <div class="hero-badge">
