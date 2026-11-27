@@ -1017,6 +1017,9 @@ with st.sidebar:
         "Model Explorer",
         "Data & Reports",
     ]
+    if "pending_nav" in st.session_state and st.session_state.pending_nav:
+        st.session_state.nav_selection_radio = st.session_state.pop("pending_nav")
+
     if "nav_selection_radio" not in st.session_state or st.session_state.nav_selection_radio not in nav_opts:
         st.session_state.nav_selection_radio = "Live Dashboard"
 
@@ -1142,6 +1145,9 @@ if nav_selection == "Live Dashboard":
             unsafe_allow_html=True,
         )
         preset_opts = ["Custom Configuration"] + list(PRESETS.keys())
+        if "pending_preset" in st.session_state and st.session_state.pending_preset:
+            st.session_state.preset_choice_select = st.session_state.pop("pending_preset")
+
         if (
             "preset_choice_select" not in st.session_state
             or st.session_state.preset_choice_select not in preset_opts
@@ -1875,8 +1881,8 @@ elif nav_selection == "Model Explorer":
                 key=f"btn_load_{idx}",
                 use_container_width=True,
             ):
-                st.session_state.preset_choice_select = pmeta["key"]
-                st.session_state.nav_selection_radio = "Live Dashboard"
+                st.session_state.pending_preset = pmeta["key"]
+                st.session_state.pending_nav = "Live Dashboard"
                 st.session_state.current_simulation = None
                 st.rerun()
 
@@ -2256,7 +2262,7 @@ elif nav_selection == "Data & Reports":
             type="primary",
             use_container_width=False,
         ):
-            st.session_state.nav_selection_radio = "Live Dashboard"
+            st.session_state.pending_nav = "Live Dashboard"
             st.session_state.current_simulation = None
             st.rerun()
 
